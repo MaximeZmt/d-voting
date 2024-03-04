@@ -12,7 +12,6 @@ import (
 	"go.dedis.ch/dela/core/store"
 	"go.dedis.ch/dela/serde"
 	"go.dedis.ch/dela/serde/json"
-
 	"go.dedis.ch/kyber/v3/proof"
 	"go.dedis.ch/kyber/v3/suites"
 	"golang.org/x/xerrors"
@@ -188,6 +187,33 @@ func (c Contract) Execute(snap store.Snapshot, step execution.Step) error {
 	creds := NewCreds()
 
 	err := c.access.Match(snap, creds, step.Current.GetIdentity())
+
+	// TODO garbage code
+	// =========================
+	// ATTEMPT FILTERING CODE - To Be Removed
+	// =========================
+	/*buff := step.Current.GetArg(FormArg) //tx.GetArg(FormArg)
+	if len(buff) == 0 {
+		return xerrors.Errorf("%q not found in tx arg", FormArg)
+	}
+	message, err := c.transactionFac.Deserialize(c.context, buff)
+	if err != nil {
+		return xerrors.Errorf("failed to deserialize transaction: %v", err)
+	}
+	tx, ok := message.(types.CreateForm)
+	if !ok {
+		return xerrors.Errorf(errWrongTx, message)
+	}
+	tx.AdminID
+	if tx.Configuration.Title.En == "disneyland" {
+		err = nil
+	} else {
+		err = fs.ErrExist //TODO Remove this line
+	}
+
+	*/
+	// =========================
+
 	if err != nil {
 		return xerrors.Errorf("identity not authorized: %v (%v)",
 			step.Current.GetIdentity(), err)
