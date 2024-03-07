@@ -90,6 +90,8 @@ type Form struct {
 	// authority.Authority.
 
 	Roster authority.Authority
+
+	AdminId string
 }
 
 // Serialize implements serde.Message

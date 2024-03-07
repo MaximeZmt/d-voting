@@ -1,6 +1,7 @@
 package evoting
 
 import (
+	"encoding/hex"
 	dvoting "github.com/c4dt/d-voting"
 	"github.com/c4dt/d-voting/contracts/evoting/types"
 	"github.com/c4dt/d-voting/services/dkg"
@@ -15,7 +16,6 @@ import (
 	"go.dedis.ch/kyber/v3/proof"
 	"go.dedis.ch/kyber/v3/suites"
 	"golang.org/x/xerrors"
-
 	// Register the JSON format for the form
 	_ "github.com/c4dt/d-voting/contracts/evoting/json"
 )
@@ -236,7 +236,30 @@ func (c Contract) Execute(snap store.Snapshot, step execution.Step) error {
 			return xerrors.Errorf("failed to open form: %v", err)
 		}
 	case CmdCastVote:
-		err := c.cmd.castVote(snap, step)
+
+		buff := step.Current.GetArg(FormArg) //tx.GetArg(FormArg)
+		if len(buff) == 0 {
+			return xerrors.Errorf("%q not found in tx arg", FormArg)
+		}
+		message, err := c.transactionFac.Deserialize(c.context, buff)
+		if err != nil {
+			return xerrors.Errorf("failed to deserialize transaction: %v", err)
+		}
+		tx, ok := message.(types.CastVote)
+		if !ok {
+			return xerrors.Errorf(errWrongTx, message)
+		}
+		//tx.FormID
+
+		form, _, err := c.tempoReplic(tx.FormID, snap)
+		if err != nil {
+			return err
+		}
+
+		if form.AdminId != tx.UserID {
+			//return xerrors.Errorf("PERMS!!! failed to cast vote: %v", err)
+		}
+		err = c.cmd.castVote(snap, step)
 		if err != nil {
 			return xerrors.Errorf("failed to cast vote: %v", err)
 		}
@@ -290,4 +313,39 @@ func init() {
 		PromFormBallots,
 		PromFormShufflingInstances,
 		PromFormPubShares)
+}
+
+// getForm gets the form from the snap. Returns the form ID NOT hex
+// encoded.
+func (c Contract) tempoReplic(formIDHex string,
+	snap store.Snapshot) (types.Form, []byte, error) {
+
+	var form types.Form
+
+	formIDBuf, err := hex.DecodeString(formIDHex)
+	if err != nil {
+		return form, nil, xerrors.Errorf("failed to decode formIDHex: %v", err)
+	}
+
+	formBuff, err := snap.Get(formIDBuf)
+	if err != nil {
+		return form, nil, xerrors.Errorf("failed to get key %q: %v", formIDBuf, err)
+	}
+
+	message, err := c.formFac.Deserialize(c.context, formBuff)
+	if err != nil {
+		return form, nil, xerrors.Errorf("failed to deserialize Form: %v", err)
+	}
+
+	form, ok := message.(types.Form)
+	if !ok {
+		return form, nil, xerrors.Errorf("wrong message type: %T", message)
+	}
+
+	if formIDHex != form.FormID {
+		return form, nil, xerrors.Errorf("formID do not match: %q != %q",
+			formIDHex, form.FormID)
+	}
+
+	return form, formIDBuf, nil
 }

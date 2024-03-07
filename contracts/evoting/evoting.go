@@ -99,6 +99,7 @@ func (e evotingCommand) createForm(snap store.Snapshot, step execution.Step) err
 		// that 1/3 of the participants go away, the form will never end.
 		Roster:           roster,
 		ShuffleThreshold: threshold.ByzantineThreshold(roster.Len()),
+		AdminId:          tx.AdminID,
 	}
 
 	PromFormStatus.WithLabelValues(form.FormID).Set(float64(form.Status))
