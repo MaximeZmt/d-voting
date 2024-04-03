@@ -3,7 +3,7 @@ import { Draggable, DropResult, Droppable } from 'react-beautiful-dnd';
 import { Answers, ID, RankQuestion } from 'types/configuration';
 import { answersFrom } from 'types/getObjectType';
 import HintButton from 'components/buttons/HintButton';
-import { internationalize } from './../../utils';
+import { internationalize, urlizeLabel } from './../../utils';
 
 export const handleOnDragEnd = (
   result: DropResult,
@@ -61,7 +61,8 @@ const Rank: FC<RankProps> = ({ rank, answers, language }) => {
   useEffect(() => {
     setTitles(rank.Title);
   }, [rank]);
-  const choiceDisplay = (choice: string, rankIndex: number) => {
+  const choiceDisplay = (choice: string, url: string, rankIndex: number) => {
+    const prettyChoice = urlizeLabel(choice, url);
     return (
       <Draggable key={choice} draggableId={choice} index={rankIndex}>
         {(provided) => (
@@ -74,7 +75,7 @@ const Rank: FC<RankProps> = ({ rank, answers, language }) => {
             <div className="flex justify-between py-4 text-sm text-gray-900">
               <p className="flex-none mx-5 rounded text-center text-gray-400">{rankIndex + 1}</p>
               <div className="flex-auto w-80 overflow-y-auto break-words pr-4 text-gray-600">
-                {choice}
+                {prettyChoice}
               </div>
               <RankListIcon />
             </div>
@@ -88,7 +89,7 @@ const Rank: FC<RankProps> = ({ rank, answers, language }) => {
       <div className="grid grid-rows-1 grid-flow-col">
         <div>
           <h3 className="text-lg break-words text-gray-600">
-            {internationalize(language, titles)}
+            {urlizeLabel(internationalize(language, titles), titles.URL)}
           </h3>
         </div>
         <div className="text-right">
@@ -102,13 +103,25 @@ const Rank: FC<RankProps> = ({ rank, answers, language }) => {
               <ul className={rank.ID} {...provided.droppableProps} ref={provided.innerRef}>
                 {Array.from(answers.RankAnswers.get(rank.ID).entries())
                   .map(([rankIndex, choiceIndex]) => {
-                    if (language === 'fr' && rank.ChoicesMap.has('fr'))
-                      return choiceDisplay(rank.ChoicesMap.get('fr')[choiceIndex], rankIndex);
-                    else if (language === 'de' && rank.ChoicesMap.has('de'))
-                      return choiceDisplay(rank.ChoicesMap.get('de')[choiceIndex], rankIndex);
-                    else if (rank.ChoicesMap.has('en'))
+                    if (language === 'fr' && rank.ChoicesMap.ChoicesMap.has('fr'))
+                      return choiceDisplay(
+                        rank.ChoicesMap.ChoicesMap.get('fr')[choiceIndex],
+                        rank.ChoicesMap.URLs[choiceIndex],
+                        rankIndex
+                      );
+                    else if (language === 'de' && rank.ChoicesMap.ChoicesMap.has('de'))
+                      return choiceDisplay(
+                        rank.ChoicesMap.ChoicesMap.get('de')[choiceIndex],
+                        rank.ChoicesMap.URLs[choiceIndex],
+                        rankIndex
+                      );
+                    else if (rank.ChoicesMap.ChoicesMap.has('en'))
                       // 'en' is the default language
-                      return choiceDisplay(rank.ChoicesMap.get('en')[choiceIndex], rankIndex);
+                      return choiceDisplay(
+                        rank.ChoicesMap.ChoicesMap.get('en')[choiceIndex],
+                        rank.ChoicesMap.URLs[choiceIndex],
+                        rankIndex
+                      );
                     return undefined;
                   })
                   .filter((e) => e !== undefined)}

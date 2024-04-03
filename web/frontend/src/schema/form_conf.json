@@ -7,9 +7,11 @@
       "properties": {
         "En": { "type": "string" },
         "Fr": { "type": "string" },
-        "De": { "type": "string" }
+        "De": { "type": "string" },
+        "URL": { "type": "string" }
       }
     },
+    "AdditionalInfo": { "type": "string" },
     "Scaffold": {
       "type": "array",
       "items": {
@@ -21,7 +23,8 @@
             "properties": {
               "En": { "type": "string" },
               "Fr": { "type": "string" },
-              "De": { "type": "string" }
+              "De": { "type": "string" },
+              "URL": { "type": "string" }
             }
           },
           "Order": {
@@ -43,14 +46,21 @@
                   "properties": {
                     "En": { "type": "string" },
                     "Fr": { "type": "string" },
-                    "De": { "type": "string" }
+                    "De": { "type": "string" },
+                    "URL": { "type": "string" }
                   }
                 },
                 "MaxN": { "type": "number" },
                 "MinN": { "type": "number" },
                 "Choices": {
                   "type": "array",
-                  "items": { "type": "string" }
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Choice": { "type": "string" },
+                      "URL": { "type": "string" }
+                    }
+                  }
                 },
                 "Hint": {
                   "type": "object",
@@ -76,14 +86,21 @@
                   "properties": {
                     "En": { "type": "string" },
                     "Fr": { "type": "string" },
-                    "De": { "type": "string" }
+                    "De": { "type": "string" },
+                    "URL": { "type": "string" }
                   }
                 },
                 "MaxN": { "type": "number" },
                 "MinN": { "type": "number" },
                 "Choices": {
                   "type": "array",
-                  "items": { "type": "string" }
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Choice": { "type": "string" },
+                      "URL": { "type": "string" }
+                    }
+                  }
                 },
                 "Hint": {
                   "type": "object",
@@ -109,7 +126,8 @@
                   "properties": {
                     "En": { "type": "string" },
                     "Fr": { "type": "string" },
-                    "De": { "type": "string" }
+                    "De": { "type": "string" },
+                    "URL": { "type": "string" }
                   }
                 },
                 "MaxN": { "type": "number" },
@@ -118,7 +136,13 @@
                 "MaxLength": { "type": "number" },
                 "Choices": {
                   "type": "array",
-                  "items": { "type": "string" }
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Choice": { "type": "string" },
+                      "URL": { "type": "string" }
+                    }
+                  }
                 },
                 "Hint": {
                   "type": "object",

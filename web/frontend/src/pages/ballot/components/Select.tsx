@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Answers, SelectQuestion } from 'types/configuration';
 import { answersFrom } from 'types/getObjectType';
 import HintButton from 'components/buttons/HintButton';
-import { internationalize } from './../../utils';
+import { internationalize, urlizeLabel } from './../../utils';
 type SelectProps = {
   select: SelectQuestion;
   answers: Answers;
@@ -60,19 +60,20 @@ const Select: FC<SelectProps> = ({ select, answers, setAnswers, language }) => {
     setTitles(select.Title);
   }, [select]);
 
-  const choiceDisplay = (isChecked: boolean, choice: string, choiceIndex: number) => {
+  const choiceDisplay = (isChecked: boolean, choice: string, url: string, choiceIndex: number) => {
+    const prettyChoice = urlizeLabel(choice, url);
     return (
       <div key={choice}>
         <input
           id={choice}
-          className="h-4 w-4 mt-1 mr-2 cursor-pointer accent-indigo-500"
+          className="h-4 w-4 mt-1 mr-2 cursor-pointer accent-[#ff0000]"
           type="checkbox"
           value={choice}
           checked={isChecked}
           onChange={(e) => handleChecks(e, choiceIndex)}
         />
         <label htmlFor={choice} className="pl-2 break-words text-gray-600 cursor-pointer">
-          {choice}
+          {prettyChoice}
         </label>
       </div>
     );
@@ -82,7 +83,7 @@ const Select: FC<SelectProps> = ({ select, answers, setAnswers, language }) => {
       <div className="grid grid-rows-1 grid-flow-col">
         <div>
           <h3 className="text-lg break-words text-gray-600">
-            {internationalize(language, titles)}
+            {urlizeLabel(internationalize(language, titles), titles.URL)}
           </h3>
         </div>
         <div className="text-right">
@@ -93,22 +94,25 @@ const Select: FC<SelectProps> = ({ select, answers, setAnswers, language }) => {
       <div className="sm:pl-8 mt-2 pl-6">
         {Array.from(answers.SelectAnswers.get(select.ID).entries())
           .map(([choiceIndex, isChecked]) => {
-            if (language === 'fr' && select.ChoicesMap.has('fr'))
+            if (language === 'fr' && select.ChoicesMap.ChoicesMap.has('fr'))
               return choiceDisplay(
                 isChecked,
-                select.ChoicesMap.get('fr')[choiceIndex],
+                select.ChoicesMap.ChoicesMap.get('fr')[choiceIndex],
+                select.ChoicesMap.URLs[choiceIndex],
                 choiceIndex
               );
-            else if (language === 'de' && select.ChoicesMap.has('de'))
+            else if (language === 'de' && select.ChoicesMap.ChoicesMap.has('de'))
               return choiceDisplay(
                 isChecked,
-                select.ChoicesMap.get('de')[choiceIndex],
+                select.ChoicesMap.ChoicesMap.get('de')[choiceIndex],
+                select.ChoicesMap.URLs[choiceIndex],
                 choiceIndex
               );
-            else if (select.ChoicesMap.has('en'))
+            else if (select.ChoicesMap.ChoicesMap.has('en'))
               return choiceDisplay(
                 isChecked,
-                select.ChoicesMap.get('en')[choiceIndex],
+                select.ChoicesMap.ChoicesMap.get('en')[choiceIndex],
+                select.ChoicesMap.URLs[choiceIndex],
                 choiceIndex
               );
             return undefined;

@@ -5,7 +5,8 @@ import Rank, { handleOnDragEnd } from './Rank';
 import Select from './Select';
 import Text from './Text';
 import { DragDropContext } from 'react-beautiful-dnd';
-import { internationalize } from './../../utils';
+import { internationalize, urlizeLabel } from './../../utils';
+import DOMPurify from 'dompurify';
 
 type BallotDisplayProps = {
   configuration: Configuration;
@@ -59,7 +60,7 @@ const BallotDisplay: FC<BallotDisplayProps> = ({
     return (
       <div key={subject.ID}>
         <h3 className="text-xl break-all pt-1 pb-1 sm:pt-2 sm:pb-2 border-t font-bold text-gray-600">
-          {internationalize(language, subject.Title)}
+          {urlizeLabel(internationalize(language, subject.Title), subject.Title.URL)}
         </h3>
         {subject.Order.map((id: ID) => (
           <div key={id}>
@@ -80,8 +81,15 @@ const BallotDisplay: FC<BallotDisplayProps> = ({
     <DragDropContext onDragEnd={(dropRes) => handleOnDragEnd(dropRes, answers, setAnswers)}>
       <div className="w-full mb-0 sm:mb-4 mt-4 sm:mt-6">
         <h3 className="pb-6 break-all text-2xl text-center text-gray-700">
-          {internationalize(language, titles)}
+          {urlizeLabel(internationalize(language, titles), titles.URL)}
         </h3>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(configuration.AdditionalInfo, {
+              USE_PROFILES: { html: true },
+            }),
+          }}
+        />
         <div className="flex flex-col">
           {configuration.Scaffold.map((subject: types.Subject) => SubjectTree(subject))}
           <div className="text-red-600 text-sm pt-3 pb-1">{userErrors}</div>

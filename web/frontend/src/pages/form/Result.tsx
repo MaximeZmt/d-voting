@@ -12,7 +12,8 @@ import { Tab } from '@headlessui/react';
 import IndividualResult from './IndividualResult';
 import { default as i18n } from 'i18next';
 import GroupedResult from './GroupedResult';
-import { internationalize } from './../utils';
+import { internationalize, urlizeLabel } from './../utils';
+import DOMPurify from 'dompurify';
 
 // Functional component that displays the result of the votes
 const FormResult: FC = () => {
@@ -98,8 +99,18 @@ const FormResult: FC = () => {
               {t('totalNumberOfVotes', { votes: result.length })}
             </h2>
             <h3 className="py-6 border-t text-2xl text-center text-gray-700">
-              {internationalize(i18n.language, configuration.Title)}
+              {urlizeLabel(
+                internationalize(i18n.language, configuration.Title),
+                configuration.Title.URL
+              )}
             </h3>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(configuration.AdditionalInfo, {
+                  USE_PROFILES: { html: true },
+                }),
+              }}
+            />
 
             <div>
               <Tab.Group>
@@ -108,8 +119,8 @@ const FormResult: FC = () => {
                     key="grouped"
                     className={({ selected }) =>
                       selected
-                        ? 'w-full focus:ring-0 rounded-lg py-2.5 text-sm font-medium leading-5 text-white bg-indigo-500 shadow'
-                        : 'w-full focus:ring-0 rounded-lg py-2.5 text-sm font-medium leading-5 text-gray-700 hover:bg-indigo-100 hover:text-indigo-500'
+                        ? 'w-full focus:ring-0 rounded-lg py-2.5 text-sm font-medium leading-5 text-white bg-[#ff0000] shadow'
+                        : 'w-full focus:ring-0 rounded-lg py-2.5 text-sm font-medium leading-5 text-gray-700 hover:bg-[#ff0000] hover:text-[#ff0000]'
                     }>
                     {t('resGroup')}
                   </Tab>
@@ -117,8 +128,8 @@ const FormResult: FC = () => {
                     key="individual"
                     className={({ selected }) =>
                       selected
-                        ? 'w-full focus:ring-0 rounded-lg py-2.5 text-sm font-medium leading-5 text-white bg-indigo-500 shadow'
-                        : 'w-full focus:ring-0 rounded-lg py-2.5 text-sm font-medium leading-5 text-gray-600 hover:bg-indigo-100 hover:text-indigo-500'
+                        ? 'w-full focus:ring-0 rounded-lg py-2.5 text-sm font-medium leading-5 text-white bg-[#ff0000] shadow'
+                        : 'w-full focus:ring-0 rounded-lg py-2.5 text-sm font-medium leading-5 text-gray-600 hover:bg-[#ff0000] hover:text-[#ff0000]'
                     }>
                     {t('resIndiv')}
                   </Tab>

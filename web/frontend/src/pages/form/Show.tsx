@@ -15,8 +15,9 @@ import useGetResults from './components/utils/useGetResults';
 import UserIDTable from './components/UserIDTable';
 import DKGStatusTable from './components/DKGStatusTable';
 import LoadingButton from './components/LoadingButton';
-import { internationalize } from './../utils';
+import { internationalize, urlizeLabel } from './../utils';
 import { default as i18n } from 'i18next';
+import DOMPurify from 'dompurify';
 
 const FormShow: FC = () => {
   const { t } = useTranslation();
@@ -223,8 +224,15 @@ const FormShow: FC = () => {
       {!loading ? (
         <>
           <div className="pt-8 text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-            {internationalize(i18n.language, titles)}
+            {urlizeLabel(internationalize(i18n.language, titles), titles.URL)}
           </div>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(configObj.AdditionalInfo, {
+                USE_PROFILES: { html: true },
+              }),
+            }}
+          />
 
           <div className="pt-2 break-all">Form ID : {formId}</div>
           {status >= Status.Open &&

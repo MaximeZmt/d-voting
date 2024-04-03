@@ -10,6 +10,7 @@ interface Title {
   En: string;
   Fr: string;
   De: string;
+  URL: string;
 }
 
 // Hint
@@ -17,6 +18,16 @@ interface Hint {
   En: string;
   Fr: string;
   De: string;
+}
+
+// Choices
+interface Choice {
+  Choice: string;
+  URL: string;
+}
+interface ChoicesMap {
+  ChoicesMap: Map<string, string[]>;
+  URLs: string[];
 }
 
 interface SubjectElement {
@@ -29,8 +40,8 @@ interface SubjectElement {
 interface RankQuestion extends SubjectElement {
   MaxN: number;
   MinN: number;
-  Choices: string[];
-  ChoicesMap: Map<string, string[]>;
+  Choices: Choice[];
+  ChoicesMap: ChoicesMap;
   Hint: Hint;
 }
 // Text describes a "text" question, which allows the user to enter free text.
@@ -39,8 +50,8 @@ interface TextQuestion extends SubjectElement {
   MinN: number;
   MaxLength: number;
   Regex: string;
-  Choices: string[];
-  ChoicesMap: Map<string, string[]>;
+  Choices: Choice[];
+  ChoicesMap: ChoicesMap;
   Hint: Hint;
 }
 
@@ -49,8 +60,8 @@ interface TextQuestion extends SubjectElement {
 interface SelectQuestion extends SubjectElement {
   MaxN: number;
   MinN: number;
-  Choices: string[];
-  ChoicesMap: Map<string, string[]>;
+  Choices: Choice[];
+  ChoicesMap: ChoicesMap;
   Hint: Hint;
 }
 
@@ -63,6 +74,7 @@ interface Subject extends SubjectElement {
 interface Configuration {
   Title: Title;
   Scaffold: Subject[];
+  AdditionalInfo: string;
 }
 
 // Answers describes the current answers for each type of question
@@ -78,6 +90,8 @@ export type {
   ID,
   Title,
   Hint,
+  Choice,
+  ChoicesMap,
   TextQuestion,
   SelectQuestion,
   RankQuestion,

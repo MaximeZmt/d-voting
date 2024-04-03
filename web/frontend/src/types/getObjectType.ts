@@ -10,8 +10,10 @@ const emptyConfiguration = (): types.Configuration => {
       En: '',
       Fr: '',
       De: '',
+      URL: '',
     },
     Scaffold: [],
+    AdditionalInfo: '',
   };
 };
 
@@ -22,6 +24,7 @@ const newSubject = (): types.Subject => {
       En: '',
       Fr: '',
       De: '',
+      URL: '',
     },
     Order: [],
     Type: SUBJECT,
@@ -36,11 +39,12 @@ const newRank = (): types.RankQuestion => {
       En: '',
       Fr: '',
       De: '',
+      URL: '',
     },
     MaxN: 2,
     MinN: 2,
     Choices: [],
-    ChoicesMap: new Map(Object.entries(obj)),
+    ChoicesMap: { ChoicesMap: new Map(Object.entries(obj)), URLs: [''] },
     Type: RANK,
     Hint: {
       En: '',
@@ -57,11 +61,12 @@ const newSelect = (): types.SelectQuestion => {
       En: '',
       Fr: '',
       De: '',
+      URL: '',
     },
     MaxN: 1,
     MinN: 1,
     Choices: [],
-    ChoicesMap: new Map(Object.entries(obj)),
+    ChoicesMap: { ChoicesMap: new Map(Object.entries(obj)), URLs: [''] },
     Type: SELECT,
     Hint: {
       En: '',
@@ -78,13 +83,14 @@ const newText = (): types.TextQuestion => {
       En: '',
       Fr: '',
       De: '',
+      URL: '',
     },
     MaxN: 1,
     MinN: 0,
     MaxLength: 50,
     Regex: '',
     Choices: [],
-    ChoicesMap: new Map(Object.entries(obj)),
+    ChoicesMap: { ChoicesMap: new Map(Object.entries(obj)), URLs: [''] },
     Type: TEXT,
     Hint: {
       En: '',
@@ -113,36 +119,39 @@ const answersFrom = (answers: types.Answers): types.Answers => {
   };
 };
 
-const choicesToChoicesMap = (choices: string[]): Map<string, string[]> => {
-  const choicesMap = new Map<string, string[]>();
+const choicesToChoicesMap = (choices: types.Choice[]): types.ChoicesMap => {
+  const choicesMap = { ChoicesMap: new Map<string, string[]>(), URLs: [] };
 
   // choices is of form `{"en": "choice1", "fr": "choix1"}`
   choices.forEach((choice) => {
-    const choiceObj = JSON.parse(choice) as { [key: string]: string };
+    const choiceObj = JSON.parse(choice.Choice) as { [key: string]: string };
     for (const [lang, c] of Object.entries(choiceObj)) {
-      if (!choicesMap.has(lang)) {
-        choicesMap.set(lang, [c]);
+      if (!choicesMap.ChoicesMap.has(lang)) {
+        choicesMap.ChoicesMap.set(lang, [c]);
       } else {
-        choicesMap.get(lang).push(c);
+        choicesMap.ChoicesMap.get(lang).push(c);
       }
     }
+    choicesMap.URLs.push(choice.URL);
   });
 
   return choicesMap;
 };
 
-const choicesMapToChoices = (ChoicesMap: Map<string, string[]>): string[] => {
-  let choices: string[] = [];
-  for (let i = 0; i < ChoicesMap.get('en').length; i++) {
+const choicesMapToChoices = (ChoicesMap: types.ChoicesMap): types.Choice[] => {
+  let choices: types.Choice[] = [];
+  for (let i = 0; i < ChoicesMap.ChoicesMap.get('en').length; i++) {
     const choiceMap = new Map<string, string>();
-    for (let key of ChoicesMap.keys()) {
-      if (ChoicesMap.get(key)[i] === '') {
+    for (let key of ChoicesMap.ChoicesMap.keys()) {
+      if (ChoicesMap.ChoicesMap.get(key)[i] === '') {
         continue;
       }
-      choiceMap.set(key, ChoicesMap.get(key)[i]);
+      choiceMap.set(key, ChoicesMap.ChoicesMap.get(key)[i]);
     }
-    const s = JSON.stringify(Object.fromEntries(choiceMap));
-    choices.push(s);
+    choices.push({
+      Choice: JSON.stringify(Object.fromEntries(choiceMap)),
+      URL: ChoicesMap.URLs[i],
+    });
   }
   return choices;
 };
