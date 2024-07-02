@@ -424,6 +424,10 @@ func (form *Form) AddVoter(userID string) error {
 		return xerrors.Errorf("failed to convert SCIPER to integer: %v", err)
 	}
 
+	if form.Status != Initial {
+		return xerrors.Errorf("Cannot add voter. The form is not in Initial status but %v", form.Status)
+	}
+
 	form.Voters = append(form.Voters, sciperInt)
 
 	return nil
@@ -454,6 +458,10 @@ func (form *Form) RemoveVoter(userID string) error {
 
 	if index < 0 {
 		return xerrors.Errorf("Error while retrieving the index of the element.")
+	}
+
+	if form.Status != Initial {
+		return xerrors.Errorf("Cannot remove voter. The form is not in Initial status but %v", form.Status)
 	}
 
 	form.Voters = append(form.Voters[:index], form.Voters[index+1:]...)
